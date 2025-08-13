@@ -1,4 +1,5 @@
 import { X, Minus, Plus, Trash2 } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -170,12 +171,14 @@ export default function ShoppingCart() {
                 </div>
               </div>
             </div>
-            <Button 
-              className="w-full bg-accent-custom hover:hover:bg-accent-hover text-white py-3 font-semibold"
-              data-testid="button-checkout"
-            >
-              Proceed to Checkout
-            </Button>
+            <Link href="/checkout">
+              <Button 
+                className="w-full bg-accent-custom hover:hover:bg-accent-hover text-white py-3 font-semibold"
+                data-testid="button-checkout"
+              >
+                Proceed to Checkout - ${cart.total}
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               className="w-full mt-2 border-gray-300 hover:bg-gray-50 text-primary-custom py-2 font-semibold"

@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
@@ -7,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useCartStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
+import WishlistButton from "./WishlistButton";
 import type { Product } from "@shared/schema";
 
 interface ProductCardProps {
@@ -14,7 +13,6 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const { sessionId, openCart } = useCartStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -50,11 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     addToCartMutation.mutate();
   };
 
-  const handleWishlistToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-  };
+
 
   const getStockBadge = () => {
     if (product.stockLevel === "low_stock") {
@@ -94,15 +88,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             {getStockBadge()}
           </div>
           <div className="absolute top-3 right-3">
-            <Button
-              variant="ghost"
-              size="sm"
+            <WishlistButton 
+              productId={product.id}
               className="bg-white p-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
-              onClick={handleWishlistToggle}
-              data-testid={`button-wishlist-${product.id}`}
-            >
-              <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'text-destructive-custom fill-current' : 'text-gray-400'}`} />
-            </Button>
+            />
           </div>
         </div>
         <div className="p-4">

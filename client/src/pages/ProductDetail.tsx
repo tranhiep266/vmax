@@ -1,7 +1,7 @@
 import { useParams } from "wouter";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Heart, Star, Minus, Plus, ShoppingCart as ShoppingCartIcon, ArrowLeft } from "lucide-react";
+import { Star, Minus, Plus, ShoppingCart as ShoppingCartIcon, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
+import WishlistButton from "@/components/WishlistButton";
+import Reviews from "@/pages/Reviews";
 import { apiRequest } from "@/lib/queryClient";
 import { useCartStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +20,6 @@ import type { Product } from "@shared/schema";
 export default function ProductDetail() {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const { sessionId, openCart } = useCartStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -148,15 +149,10 @@ export default function ProductDetail() {
               <div className="absolute top-4 left-4">
                 {getStockBadge()}
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
+              <WishlistButton 
+                productId={product.id}
                 className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-sm hover:shadow-md"
-                onClick={() => setIsWishlisted(!isWishlisted)}
-                data-testid="button-wishlist-detail"
-              >
-                <Heart className={`h-5 w-5 ${isWishlisted ? 'text-destructive-custom fill-current' : 'text-gray-400'}`} />
-              </Button>
+              />
             </div>
           </div>
 
@@ -286,10 +282,7 @@ export default function ProductDetail() {
             </TabsContent>
             
             <TabsContent value="reviews" className="mt-6">
-              <div className="bg-background-gray rounded-lg p-6">
-                <h3 className="text-xl font-bold text-primary-custom mb-4">Customer Reviews</h3>
-                <p className="text-secondary-custom">Reviews functionality coming soon!</p>
-              </div>
+              <Reviews productId={product.id} productName={product.name} />
             </TabsContent>
             
             <TabsContent value="shipping" className="mt-6">

@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/lib/store";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import SearchResults from "./SearchResults";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const { 
@@ -18,6 +20,9 @@ export default function Header() {
     closeMobileMenu 
   } = useCartStore();
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   const { data: cartData } = useQuery({
     queryKey: ['/api/cart', sessionId],
     enabled: !!sessionId,
@@ -29,6 +34,17 @@ export default function Header() {
       setCart(cartData as any);
     }
   }, [cartData, setCart]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setIsSearchOpen(true);
+    }
+  };
+
+  const handleSearchClick = () => {
+    setIsSearchOpen(true);
+  };
 
   return (
     <>
@@ -85,27 +101,34 @@ export default function Header() {
             <div className="flex items-center space-x-4">
               {/* Search Bar */}
               <div className="hidden md:flex relative">
-                <Input 
-                  type="text" 
-                  placeholder="Search phones, accessories..." 
-                  className="w-64 pr-10 border-gray-300 focus:border-accent-custom focus:ring-accent-custom"
-                  data-testid="input-search"
-                />
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 text-secondary-custom hover:text-accent-custom"
-                  data-testid="button-search"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
+                <form onSubmit={handleSearchSubmit}>
+                  <Input 
+                    type="text" 
+                    placeholder="Search phones, accessories..." 
+                    className="w-64 pr-10 border-gray-300 focus:border-accent-custom focus:ring-accent-custom dark:bg-muted dark:border-gray-600"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onClick={handleSearchClick}
+                    data-testid="input-search"
+                  />
+                  <Button 
+                    type="submit"
+                    variant="ghost" 
+                    size="sm" 
+                    className="absolute right-1 top-1/2 transform -translate-y-1/2 text-secondary-custom hover:text-accent-custom"
+                    data-testid="button-search"
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </form>
               </div>
               
               {/* User Actions */}
-              <Button variant="ghost" size="sm" className="text-primary-custom hover:text-accent-custom" data-testid="button-user">
+              <ThemeToggle />
+              <Button variant="ghost" size="sm" className="text-primary-custom hover:text-accent-custom dark:text-primary-foreground dark:hover:text-accent-custom" data-testid="button-user">
                 <User className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-primary-custom hover:text-accent-custom" data-testid="button-wishlist">
+              <Button variant="ghost" size="sm" className="text-primary-custom hover:text-accent-custom dark:text-primary-foreground dark:hover:text-accent-custom" data-testid="button-wishlist">
                 <Heart className="h-5 w-5" />
               </Button>
               <Button 
@@ -170,6 +193,14 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      {/* Search Results Overlay */}
+      <SearchResults 
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
     </>
   );
 }
