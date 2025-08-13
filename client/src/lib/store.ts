@@ -16,6 +16,7 @@ interface CartStore {
   toggleMobileMenu: () => void;
   closeMobileMenu: () => void;
   generateSessionId: () => void;
+  clearCart: (sessionId: string) => Promise<void>;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -33,6 +34,19 @@ export const useCartStore = create<CartStore>()(
       toggleMobileMenu: () => set((state) => ({ isMobileMenuOpen: !state.isMobileMenuOpen })),
       closeMobileMenu: () => set({ isMobileMenuOpen: false }),
       generateSessionId: () => set({ sessionId: crypto.randomUUID() }),
+      clearCart: async (sessionId: string) => {
+        try {
+          const response = await fetch(`/api/cart/clear/${sessionId}`, {
+            method: 'DELETE'
+          });
+          if (response.ok) {
+            const emptyCart = await response.json();
+            set({ cart: emptyCart });
+          }
+        } catch (error) {
+          console.error('Failed to clear cart:', error);
+        }
+      },
     }),
     {
       name: 'cart-store',
